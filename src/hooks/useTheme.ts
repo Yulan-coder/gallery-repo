@@ -17,9 +17,8 @@ export function useTheme() {
     
     // Check localStorage first, then system preference
     const storedTheme = localStorage.getItem('theme');
-    const isValidTheme = storedTheme === 'light' || storedTheme === 'dark';
     
-    if (isValidTheme) {
+    if (storedTheme === 'light' || storedTheme === 'dark') {
       setTheme(storedTheme);
       applyThemeToDOM(storedTheme);
     } else {
