@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -12,13 +12,14 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Initialize based on current class on html element
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-    }
-    return 'light';
-  });
+  // Initialize with a safe default
+  const [theme, setTheme] = useState<Theme>('light');
+
+  // Sync with the actual DOM state after mount
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'light');
+  }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
