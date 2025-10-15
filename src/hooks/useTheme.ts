@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
+function applyThemeToDOM(theme: Theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+}
+
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
@@ -12,16 +16,18 @@ export function useTheme() {
     setMounted(true);
     
     // Check localStorage first, then system preference
-    const storedTheme = localStorage.getItem('theme') as Theme | null;
-    if (storedTheme) {
+    const storedTheme = localStorage.getItem('theme');
+    const isValidTheme = storedTheme === 'light' || storedTheme === 'dark';
+    
+    if (isValidTheme) {
       setTheme(storedTheme);
-      document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+      applyThemeToDOM(storedTheme);
     } else {
       // Default to system preference
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const systemTheme = prefersDark ? 'dark' : 'light';
       setTheme(systemTheme);
-      document.documentElement.classList.toggle('dark', systemTheme === 'dark');
+      applyThemeToDOM(systemTheme);
     }
   }, []);
 
@@ -29,7 +35,7 @@ export function useTheme() {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    applyThemeToDOM(newTheme);
   };
 
   return { theme, toggleTheme, mounted };
